@@ -9,6 +9,7 @@ Test-Alias '`?' Where-Object
 $vbox = New-Object -ComObject VirtualBox.VirtualBox
 
 . $PSScriptRoot\Enum.ps1
+. $PSScriptRoot\HardDisk.ps1
 . $PSScriptRoot\Machine.ps1
 . $PSScriptRoot\MachineLifecycle.ps1
 
@@ -22,4 +23,10 @@ $commandNames = (Get-Command -Module PSVBox -Name *-Machine).Name
 Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -ScriptBlock {
 	Param($commandName, $parameterName, $wordToComplete)
 	(Get-Machine "$wordToComplete*").Name | Sort-Object -Unique
+}
+
+$commandNames = (Get-Command -Module PSVBox -Name *-HardDisk).Name
+Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -ScriptBlock {
+	Param($commandName, $parameterName, $wordToComplete)
+	(Get-HardDisk "$wordToComplete*").Name | Sort-Object -Unique
 }
