@@ -1,3 +1,19 @@
+enum AccessMode {
+	ReadOnly  = 1
+	ReadWrite = 2
+}
+
+enum DeviceType {
+	Null         = 0
+	Floppy       = 1
+	DVD          = 2
+	HardDisk     = 3
+	Network      = 4
+	USB          = 5
+	SharedFolder = 6
+	Graphics3D   = 7
+}
+
 enum LockType {
 	Null   = 0
 	Shared = 1
@@ -37,6 +53,18 @@ enum MachineStatePseudo {
 	LastOnline             = 19
 	FirstTransient         =  8
 	LastTransient          = 23
+}
+
+enum MediumVariant {
+	Standard            =          0
+	VmdkSplit2G         =       0x01
+	VmdkRawDisk         =       0x02
+	VmdkStreamOptimized =       0x04
+	VmdkESX             =       0x08
+	VdiZeroExpand       =      0x100
+	Fixed               =    0x10000
+	Diff                =    0x20000
+	NoCreateDir         = 0x40000000
 }
 
 enum SessionState {
