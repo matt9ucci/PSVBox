@@ -3,6 +3,13 @@ enum AccessMode {
 	ReadWrite = 2
 }
 
+enum CleanupMode {
+	UnregisterOnly               = 1
+	DetachAllReturnNone          = 2
+	DetachAllReturnHardDisksOnly = 3
+	Full                         = 4
+}
+
 enum DeviceType {
 	Null         = 0
 	Floppy       = 1
@@ -73,4 +80,15 @@ enum SessionState {
 	Locked    = 2
 	Spawning  = 3
 	Unlocking = 4
+}
+
+enum StorageBus {
+	Null   = 0
+	IDE    = 1
+	SATA   = 2
+	SCSI   = 3
+	Floppy = 4
+	SAS    = 5
+	USB    = 6
+	PCIe   = 7
 }

@@ -33,6 +33,118 @@ function Get-Machine {
 	}
 }
 
+<#
+.EXAMPLE
+	$ubuntu = @{
+		Name = 'ubuntu-16.04.4'
+		OsTypeId = 'Ubuntu_64'
+		MemorySize = 2GB
+		HardDiskFormat = 'VMDK'
+		HardDiskSize = 32GB
+		DvdPath = Join-Path $HOME ubuntu-16.04.4-server-amd64.iso
+		Description = 'Ubuntu example'
+	}
+	New-Machine @ubuntu -Verbose
+#>
+function New-Machine {
+	[CmdletBinding()]
+	Param(
+		[Parameter(Mandatory, Position = 0, HelpMessage = "Machine ID")]
+		[string]$Name,
+		[string]$OsTypeId,
+		[string[]]$Groups = '/',
+		[Parameter(HelpMessage = "System memory size in bytes (eg. 1GB)")]
+		[uint64]$MemorySize,
+		[Parameter(HelpMessage = "Video memory size in bytes (eg. 16MB)")]
+		[uint64]$VRamSize,
+		[Parameter(HelpMessage = "Hard disk size in bytes (eg. 10GB)")]
+		[uint64]$HardDiskSize,
+		[string]$HardDiskFormat = $vbox.SystemProperties.DefaultHardDiskFormat,
+		[Parameter(HelpMessage = "Dvd image path")]
+		[string]$DvdPath,
+		[string]$Description
+	)
+
+	if (Test-Machine $Name) {
+		Write-Error ('{0} already exists' -f $Name)
+		return
+	}
+
+	$m = $vbox.CreateMachine($null, $Name, $Groups, $OsTypeId, $null)
+
+	$osType = $vbox.GetGuestOSType($m.OSTypeId)
+
+	$m.MemorySize = if ($MemorySize) { [uint32]($MemorySize / 1MB) } else { $osType.RecommendedRAM }
+	$m.VRAMSize = if ($VRamSize) { [uint32]($VRamSize / 1MB) } else { $osType.RecommendedVRAM }
+	$m.Description = if ($Description) { $Description } else { $osType.Description }
+
+	# Add recommended storage controllers
+	$sc = $m.addStorageController('HardDisk', $osType.RecommendedHDStorageBus)
+	Write-Verbose ('Add {0} controller for hard disk' -f ([StorageBus]$sc.Bus))
+	$sc = $m.addStorageController('DVD', $osType.RecommendedDVDStorageBus)
+	Write-Verbose ('Add {0} controller for DVD' -f ([StorageBus]$sc.Bus))
+
+	# Save settings file implicitly and register machine
+	$vbox.RegisterMachine($m)
+
+	# Create hard disk
+	$hdParam = @{
+		Path = Join-Path (Split-Path $m.SettingsFilePath) "$($m.Name).$($HardDiskFormat.ToLower())"
+		Size = if ($HardDiskSize) { $HardDiskSize } else { $osType.RecommendedHDD }
+		Format = $HardDiskFormat
+	}
+	$hd = New-HardDisk @hdParam
+
+	# Attach hard disk to machine
+	try {
+		$session = New-Object -ComObject 'VirtualBox.Session'
+		$m.LockMachine($session, [LockType]::Shared)
+		$session.Machine.attachDevice('HardDisk', 0, 0, [DeviceType]::HardDisk, $hd)
+		$session.Machine.SaveSettings()
+	} finally {
+		if ($session.State -eq [SessionState]::Locked) { $session.UnlockMachine() }
+	}
+
+	# Attach DVD to machine
+	if ($DvdPath) {
+		$dvd = $vbox.OpenMedium($DvdPath, [DeviceType]::DVD, [AccessMode]::ReadOnly, $false)
+		try {
+			$session = New-Object -ComObject 'VirtualBox.Session'
+			$m.LockMachine($session, [LockType]::Shared)
+			$session.Machine.attachDevice('DVD', 0, 0, [DeviceType]::DVD, $dvd)
+			$session.Machine.SaveSettings()
+		} finally {
+			if ($session.State -eq [SessionState]::Locked) { $session.UnlockMachine() }
+		}
+	}
+
+	$m
+}
+
+<#
+.EXAMPLE
+	Remove-Machine -Id (Get-Machine ubuntu-16.04.4).Id
+#>
+function Remove-Machine {
+	Param(
+		[Parameter(Mandatory, HelpMessage = "Machine ID")]
+		[string]$Id
+	)
+
+	$m = $vbox.FindMachine($Id)
+	$hds = $m.Unregister(([CleanupMode]::DetachAllReturnHardDisksOnly))
+
+	# Remove *.vbox file
+	$progress = $m.DeleteConfig([System.MarshalByRefObject[]]$hds)
+	Write-Verbose $progress.OperationDescription
+	$progress.waitForCompletion(-1)
+
+	# Manually remove hard disks because DeleteConfig() does not
+	Remove-HardDisk -Id $hds.Id
+
+	Remove-Item -Path (Split-Path $m.SettingsFilePath) -Recurse -Verbose
+}
+
 function Resolve-MachineName {
 	Param(
 		[SupportsWildcards()]
@@ -55,4 +167,14 @@ function Resolve-MachineId {
 	Process {
 		$Id | % { $vbox.Machines.Id -like $_ }
 	}
+}
+
+function Test-Machine {
+	Param(
+		[SupportsWildcards()]
+		[Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = "Machine name")]
+		[string[]]$Name
+	)
+
+	(Get-Machine $Name) -and $true
 }

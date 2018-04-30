@@ -10,6 +10,7 @@ Description = 'Controlling VirtualBox with PowerShell'
 
 FunctionsToExport = @(
 	'Get-Machine'
+	'New-Machine', 'Remove-Machine'
 	'Start-Machine', 'Stop-Machine'
 	'Get-HardDisk'
 	'New-HardDisk', 'Remove-HardDisk'
