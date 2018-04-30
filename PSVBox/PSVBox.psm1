@@ -10,6 +10,7 @@ $vbox = New-Object -ComObject VirtualBox.VirtualBox
 
 . $PSScriptRoot\Enum.ps1
 . $PSScriptRoot\Machine.ps1
+. $PSScriptRoot\MachineLifecycle.ps1
 
 # Release COM object immediately when invoking Remove-Module cmdlet
 $MyInvocation.MyCommand.ScriptBlock.Module.OnRemove = {

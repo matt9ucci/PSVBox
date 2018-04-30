@@ -10,6 +10,7 @@ Description = 'Controlling VirtualBox with PowerShell'
 
 FunctionsToExport = @(
 	'Get-Machine'
+	'Start-Machine', 'Stop-Machine'
 )
 CmdletsToExport = @()
 VariablesToExport = @()

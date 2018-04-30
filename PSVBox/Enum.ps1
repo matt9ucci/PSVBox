@@ -1,3 +1,10 @@
+enum LockType {
+	Null   = 0
+	Shared = 1
+	Write  = 2
+	VM     = 3
+}
+
 enum MachineState {
 	Null                   =  0
 	PoweredOff             =  1
@@ -23,4 +30,19 @@ enum MachineState {
 	DeletingSnapshot       = 21
 	SettingUp              = 22
 	Snapshotting           = 23
+}
+
+enum MachineStatePseudo {
+	FirstOnline            =  5
+	LastOnline             = 19
+	FirstTransient         =  8
+	LastTransient          = 23
+}
+
+enum SessionState {
+	Null      = 0
+	Unlocked  = 1
+	Locked    = 2
+	Spawning  = 3
+	Unlocking = 4
 }
