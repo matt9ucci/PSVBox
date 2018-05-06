@@ -13,6 +13,9 @@ function Get-Machine {
 		[Parameter(ParameterSetName = 'Name', Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = "Machine name")]
 		[string[]]$Name = '*',
 		[SupportsWildcards()]
+		[Parameter(ParameterSetName = 'Name', Position = 1, HelpMessage = "Machine group")]
+		[string[]]$Group = '/',
+		[SupportsWildcards()]
 		[Parameter(ParameterSetName = 'Id', ValueFromPipelineByPropertyName, HelpMessage = "Machine ID")]
 		[string[]]$Id = '*',
 		[Parameter(HelpMessage = "Machine state")]
@@ -21,8 +24,8 @@ function Get-Machine {
 
 	Process {
 		$machines = switch ($PSCmdlet.ParameterSetName) {
-			Name { $Name | % { $vbox.Machines | ? Name -In (Resolve-MachineName $_) } }
-			Id   { $Id   | % { $vbox.Machines | ? Id   -In (Resolve-MachineId $_) } }
+			Name { $vbox.Machines | MachineByName $Name | MachineByGroup $Group }
+			Id { $Id | % { $vbox.Machines | ? Id -In (Resolve-MachineId $_) } }
 		}
 
 		if ($State) {
@@ -145,18 +148,6 @@ function Remove-Machine {
 	Remove-Item -Path (Split-Path $m.SettingsFilePath) -Recurse -Verbose
 }
 
-function Resolve-MachineName {
-	Param(
-		[SupportsWildcards()]
-		[Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = "Machine name")]
-		[string[]]$Name
-	)
-
-	Process {
-		$Name | % { $vbox.Machines.Name -like $_ }
-	}
-}
-
 function Resolve-MachineId {
 	Param(
 		[SupportsWildcards()]
@@ -177,4 +168,12 @@ function Test-Machine {
 	)
 
 	(Get-Machine $Name) -and $true
+}
+
+filter MachineByName([string[]]$Name) {
+	foreach ($n in $Name) { if ($_.Name -like $n) { $_; return } }
+}
+
+filter MachineByGroup([string[]]$Group) {
+	foreach ($g in $Group) { if ($_.Groups -like $g) { $_; return } }
 }

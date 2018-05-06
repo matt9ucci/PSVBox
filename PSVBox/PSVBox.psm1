@@ -24,6 +24,10 @@ Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -Scrip
 	Param($commandName, $parameterName, $wordToComplete)
 	(Get-Machine "$wordToComplete*").Name | Sort-Object -Unique
 }
+Register-ArgumentCompleter -ParameterName Group -CommandName $commandNames -ScriptBlock {
+	Param($commandName, $parameterName, $wordToComplete)
+	@($vbox.MachineGroups) -like "$wordToComplete*" | Sort-Object -Unique
+}
 
 $commandNames = (Get-Command -Module PSVBox -Name *-HardDisk).Name
 Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -ScriptBlock {
