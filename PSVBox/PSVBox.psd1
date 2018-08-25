@@ -14,6 +14,7 @@ FunctionsToExport = @(
 	'Start-Machine', 'Stop-Machine'
 	'Get-HardDisk'
 	'New-HardDisk', 'Remove-HardDisk'
+	'Get-HostNetworkInterface'
 )
 CmdletsToExport = @()
 VariablesToExport = @()

@@ -10,6 +10,7 @@ $vbox = New-Object -ComObject VirtualBox.VirtualBox
 
 . $PSScriptRoot\Enum.ps1
 . $PSScriptRoot\HardDisk.ps1
+. $PSScriptRoot\Host.ps1
 . $PSScriptRoot\Machine.ps1
 . $PSScriptRoot\MachineLifecycle.ps1
 
@@ -33,4 +34,10 @@ $commandNames = (Get-Command -Module PSVBox -Name *-HardDisk).Name
 Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -ScriptBlock {
 	Param($commandName, $parameterName, $wordToComplete)
 	(Get-HardDisk "$wordToComplete*").Name | Sort-Object -Unique
+}
+
+$commandNames = (Get-Command -Module PSVBox -Name *-HostNetworkInterface).Name
+Register-ArgumentCompleter -ParameterName Name -CommandName $commandNames -ScriptBlock {
+	Param($commandName, $parameterName, $wordToComplete)
+	(Get-HostNetworkInterface "$wordToComplete*").Name | Sort-Object -Unique | % { "'{0}'" -f $_ }
 }

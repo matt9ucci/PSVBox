@@ -21,6 +21,24 @@ enum DeviceType {
 	Graphics3D   = 7
 }
 
+enum HostNetworkInterfaceMediumType {
+	Unknown  = 0
+	Ethernet = 1
+	PPP      = 2
+	SLIP     = 3
+}
+
+enum HostNetworkInterfaceStatus {
+	Unknown = 0
+	Up      = 1
+	Down    = 2
+}
+
+enum HostNetworkInterfaceType {
+	Bridged  = 1
+	HostOnly = 2
+}
+
 enum LockType {
 	Null   = 0
 	Shared = 1
