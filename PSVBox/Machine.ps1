@@ -137,14 +137,15 @@ function Remove-Machine {
 	$m = $vbox.FindMachine($Id)
 	$hds = $m.Unregister(([CleanupMode]::DetachAllReturnHardDisksOnly))
 
-	# Remove *.vbox file
-	$progress = $m.DeleteConfig([System.MarshalByRefObject[]]$hds)
-	Write-Verbose $progress.OperationDescription
-	$progress.waitForCompletion(-1)
+	# Remove *.vbox file but DeleteConfig() throws Exception
+	# $progress = $m.DeleteConfig([System.MarshalByRefObject[]]$hds)
+	# Write-Verbose $progress.OperationDescription
+	# $progress.waitForCompletion(-1)
 
 	# Manually remove hard disks because DeleteConfig() does not
 	Remove-HardDisk -Id $hds.Id
 
+	# Workaround: remove *.vbox file (DeleteConfig() is preferred)
 	Remove-Item -Path (Split-Path $m.SettingsFilePath) -Recurse -Verbose
 }
 
