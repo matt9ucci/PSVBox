@@ -65,7 +65,9 @@ function New-Machine {
 		[string]$HardDiskFormat = $vbox.SystemProperties.DefaultHardDiskFormat,
 		[Parameter(HelpMessage = "Dvd image path")]
 		[string]$DvdPath,
-		[string]$Description
+		[string]$Description,
+		[ClipboardMode]$ClipboardMode = [ClipboardMode]::Disabled,
+		[DnDMode]$DnDMode = [DnDMode]::Disabled
 	)
 
 	if (Test-Machine $Name) {
@@ -80,6 +82,9 @@ function New-Machine {
 	$m.MemorySize = if ($MemorySize) { [uint32]($MemorySize / 1MB) } else { $osType.RecommendedRAM }
 	$m.VRAMSize = if ($VRamSize) { [uint32]($VRamSize / 1MB) } else { $osType.RecommendedVRAM }
 	$m.Description = if ($Description) { $Description } else { $osType.Description }
+
+	$m.ClipboardMode = $ClipboardMode
+	$m.DnDMode = $DnDMode
 
 	# Add recommended storage controllers
 	$sc = $m.addStorageController('HardDisk', $osType.RecommendedHDStorageBus)

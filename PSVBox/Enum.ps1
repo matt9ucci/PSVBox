@@ -10,6 +10,13 @@ enum CleanupMode {
 	Full                         = 4
 }
 
+enum ClipboardMode {
+	Disabled      = 0
+	HostToGuest   = 1
+	GuestToHost   = 2
+	Bidirectional = 3
+}
+
 enum DeviceType {
 	Null         = 0
 	Floppy       = 1
@@ -19,6 +26,13 @@ enum DeviceType {
 	USB          = 5
 	SharedFolder = 6
 	Graphics3D   = 7
+}
+
+enum DnDMode {
+	Disabled      = 0
+	HostToGuest   = 1
+	GuestToHost   = 2
+	Bidirectional = 3
 }
 
 enum HostNetworkInterfaceMediumType {
