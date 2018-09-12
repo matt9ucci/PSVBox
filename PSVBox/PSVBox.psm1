@@ -8,6 +8,7 @@ Test-Alias '`?' Where-Object
 
 $vbox = New-Object -ComObject VirtualBox.VirtualBox
 
+. $PSScriptRoot\Download.ps1
 . $PSScriptRoot\Enum.ps1
 . $PSScriptRoot\HardDisk.ps1
 . $PSScriptRoot\Host.ps1
