@@ -7,11 +7,9 @@ param (
 Import-Module $PSScriptRoot\..\PSVBox\PSVBox -Force -Scope Local
 
 if (!$Version) { $Version = Get-LatestVersion }
-$uri = 'https://download.virtualbox.org/virtualbox/{0}/{1}SUMS' -f $Version, $Algorithm
-
+$uri = "https://download.virtualbox.org/virtualbox/${Version}/${Algorithm}SUMS"
 $outFileDir = "$PSScriptRoot\..\Temp"
-$outFileName = Split-Path $Uri -Leaf
+$outFileName = Split-Path $uri -Leaf
 
 New-Item $outFileDir -ItemType Directory -Force > $null
-
-Invoke-WebRequest -Uri $uri -OutFile (Join-Path $outFileDir $outFileName) -Verbose
+Invoke-WebRequest $uri -OutFile (Join-Path $outFileDir $outFileName) -Verbose
