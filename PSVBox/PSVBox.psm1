@@ -7,6 +7,7 @@ Test-Alias % ForEach-Object
 Test-Alias '`?' Where-Object
 
 $vbox = New-Object -ComObject VirtualBox.VirtualBox
+$vboxVersion = $vbox.Version -split '\.' # e.g. @(6, 1, 0_RC1)
 
 . $PSScriptRoot\Download.ps1
 . $PSScriptRoot\Enum.ps1

@@ -80,7 +80,15 @@ function New-Machine {
 	$osType = $vbox.GetGuestOSType($m.OSTypeId)
 
 	$m.MemorySize = if ($MemorySize) { [uint32]($MemorySize / 1MB) } else { $osType.RecommendedRAM }
-	$m.VRAMSize = if ($VRamSize) { [uint32]($VRamSize / 1MB) } else { $osType.RecommendedVRAM }
+
+	if ($vboxVersion[0] -ge 6 -and $vboxVersion[1] -ge 1) {
+		# after version 6.1
+		$m.GraphicsAdapter.VRAMSize = if ($VRamSize) { [uint32]($VRamSize / 1MB) } else { $osType.RecommendedVRAM }
+	} else {
+		# before version 6.1
+		$m.VRAMSize = if ($VRamSize) { [uint32]($VRamSize / 1MB) } else { $osType.RecommendedVRAM }
+	}
+
 	$m.Description = if ($Description) { $Description } else { $osType.Description }
 
 	$m.ClipboardMode = $ClipboardMode
