@@ -1,5 +1,5 @@
-﻿$projectRoot = Join-Path $PSScriptRoot ..
-Import-Module (Join-Path $projectRoot PSVBoxManage) -Force
+﻿$projectRoot = Join-Path $PSScriptRoot .. ..
+Import-Module (Join-Path $projectRoot PSVBox) -Force
 
 Describe "New-Machine" {
 	It "returns a default machine" {
@@ -14,7 +14,8 @@ Describe "New-Machine" {
 		$m.Name | Should Be 'custom'
 		$m.OSTypeId | Should Be 'Ubuntu_64'
 		$m.MemorySize | Should Be 4096
-		$m.VRAMSize | Should Be 12
+		$vramSize = $m.VRAMSize ? $m.VRAMSize : $m.GraphicsAdapter.VRAMSize
+		$vramSize | Should Be 12
 	}
 }
 
